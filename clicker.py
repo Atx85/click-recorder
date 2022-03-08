@@ -11,7 +11,6 @@ startPlaying = False # init play loop
 stopppedPlaying = False # the loop has finished
 nextEvent = 0 # the next event from the eventTimes array
 timePaused = False
-pausedAt = -1
 t0 = 0
 eventTimes = []
 mouseController = Controller()
@@ -49,6 +48,7 @@ def show_message(state):
         if state == 'played click':
             print('next event: ' + str(nextEvent))
             print('iterations: ' + str(iterations))
+            print('time: ' + str(time.time() - t0))
             for i,c in enumerate(eventTimes):
                 if i == nextEvent - 1:
                     print(">" + str(c))
@@ -87,6 +87,7 @@ def main():
                 recordingStopped = True
                 listener.stop()
                 showMessage = True
+                show_message('finished recording')
             if keyboard.is_pressed('p'):
                 startPlaying = True
 
@@ -95,15 +96,15 @@ def main():
                     timePaused = True         
                 if keyboard.is_pressed('h') and timePaused:
                     timePaused = False
-                    t0 = time.time() + eventTimes[pausedAt]['time']
+                    t0 = time.time() + eventTimes[nextEvent]['time']
             if timerStarted and not recordingStarted and not recordingStopped:
-                t0 = time.time() - eventTimes[nextEvent - 1]['time']
+                t0 = time.time() + eventTimes[nextEvent - 1]['time']
                 timerStarted = False
                 recordingStarted = True
 
             if startPlaying and not timePaused:
-                actualTime = time.time() - t0
                 if stopppedPlaying:
+                    # resetting the timer for each round
                     t0 = time.time()
                     nextEvent = 0
                     stopppedPlaying = False
